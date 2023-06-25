@@ -1,0 +1,19 @@
+# 表示获取表结构方式，0代表jdbc
+fetchType: 0
+# fetchType为0时，以下四项必填
+driver: com.mysql.cj.jdbc.Driver
+jdbcUrl: jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+username: username
+password: password
+
+# 以下3项不能为空
+
+# 实体类包名，包不存在时自动创建，但已存在的包里面不能有东西
+entityGenPkg: sample.entity
+# Mapper包名
+mapperInterfaceGenPkg: sample.mapper
+# xml绝对路径 TODO
+mapperXmlGenAbsPath: /Users/mac/IdeaProjects/codegen-maven-plugin/src/main/resources
+
+# 不生成
+excludedTables: skip_1,skip_2
