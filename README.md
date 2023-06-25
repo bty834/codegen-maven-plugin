@@ -2,6 +2,14 @@
 
 Java类生成使用javapoet
 
+# 示例
+## entity
+![](doc/image/entity.png)
+## mapper
+![](doc/image/mapper.png)
+## xml
+TODO
+
 # 使用
 1. 引入build
 ```xml

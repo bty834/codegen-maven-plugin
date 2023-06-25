@@ -62,7 +62,7 @@ public class SQLTableGenMojo extends AbstractMojo {
             configProperties = parseConfigFile(filePath);
             configProperties.setBaseDir(baseAbsoluteDir);
         } catch (IOException | MojoExecutionException e) {
-            throw new MojoExecutionException("Failed to generate code: file not exists");
+            throw new MojoExecutionException("Failed to generate code: "+e);
         }
         Set<Table> tables = null;
         try {

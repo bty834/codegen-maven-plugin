@@ -3,8 +3,8 @@ fetchType: 0
 # fetchType为0时，以下四项必填
 driver: com.mysql.cj.jdbc.Driver
 jdbcUrl: jdbc:mysql://localhost:3306/test?zeroDateTimeBehavior=convertToNull&characterEncoding=utf8&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-username: username
-password: password
+username: root
+password: 12345678
 
 # 以下3项不能为空
 
@@ -16,4 +16,5 @@ mapperInterfaceGenPkg: sample.mapper
 mapperXmlGenAbsPath: /Users/mac/IdeaProjects/codegen-maven-plugin/src/main/resources
 
 # 不生成
-excludedTables: skip_1,skip_2
+excludedTables: [skip_1,skip_2]
+
