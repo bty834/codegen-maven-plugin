@@ -1,19 +1,15 @@
 package codegen.parser;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import org.apache.commons.lang3.ObjectUtils;
-import org.yaml.snakeyaml.Yaml;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
-import codegen.config.ConfigProperties;
+import codegen.ConfigProperties;
 
 /**
  * TODO 类描述

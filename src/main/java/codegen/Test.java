@@ -17,6 +17,9 @@ public class Test {
 
         mojo.doExecute("/Users/mac/IdeaProjects/codegen-maven-plugin","/Users/mac/IdeaProjects/codegen-maven-plugin/src/main/resources/sample.yaml");
 
+
+
+
     }
 
 }

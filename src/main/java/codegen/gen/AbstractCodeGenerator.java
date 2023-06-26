@@ -5,7 +5,7 @@ import java.sql.Types;
 import java.util.Objects;
 import org.apache.maven.plugin.MojoExecutionException;
 import com.google.common.base.CaseFormat;
-import codegen.config.ConfigProperties;
+import codegen.ConfigProperties;
 
 /**
  * TODO 类描述
@@ -83,6 +83,9 @@ public abstract class AbstractCodeGenerator implements CodeGenerator {
             case Types.CHAR:
             case Types.VARCHAR:
             case Types.LONGVARCHAR:
+            case Types.TIME:
+            case Types.TIMESTAMP:
+            case Types.DATE:
                 result = String.class;
                 break;
             case Types.NUMERIC:
@@ -111,15 +114,6 @@ public abstract class AbstractCodeGenerator implements CodeGenerator {
             case Types.VARBINARY:
             case Types.LONGVARBINARY:
                 result = Byte[].class;
-                break;
-            case Types.DATE:
-                result = java.sql.Date.class;
-                break;
-            case Types.TIME:
-                result = java.sql.Time.class;
-                break;
-            case Types.TIMESTAMP:
-                result = java.sql.Timestamp.class;
                 break;
         }
         return result;

@@ -1,4 +1,4 @@
-package codegen.config;
+package codegen;
 
 import org.apache.commons.lang3.StringUtils;
 

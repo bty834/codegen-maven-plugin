@@ -14,7 +14,7 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import codegen.config.ConfigProperties;
+
 import codegen.gen.CodeGenerator;
 import codegen.table.Table;
 import codegen.parser.ConfigFileParser;

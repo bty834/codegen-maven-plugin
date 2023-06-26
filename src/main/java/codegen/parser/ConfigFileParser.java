@@ -2,7 +2,7 @@ package codegen.parser;
 
 import java.io.IOException;
 
-import codegen.config.ConfigProperties;
+import codegen.ConfigProperties;
 
 /**
  * TODO 类描述

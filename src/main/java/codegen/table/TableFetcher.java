@@ -2,7 +2,7 @@ package codegen.table;
 
 import java.util.Set;
 
-import codegen.config.ConfigProperties;
+import codegen.ConfigProperties;
 
 /**
  * TODO 类描述
