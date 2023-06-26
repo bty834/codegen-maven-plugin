@@ -28,7 +28,7 @@ import codegen.table.TableFetcher;
  * @author: baotingyu
  * @date: 2023/6/24
  **/
-@Mojo(name = "codegen", defaultPhase = LifecyclePhase.COMPILE)
+@Mojo(name = "codegen", defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class SQLTableGenMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project}", required = true, readonly = true)
