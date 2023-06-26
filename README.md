@@ -7,8 +7,8 @@ Java类生成使用javapoet
 ![](doc/image/entity.png)
 ## mapper
 ![](doc/image/mapper.png)
-## xml
-TODO
+
+TODO: 查询用的 Example实体类 和 mapper XML
 
 # 使用
 1. 引入build
@@ -35,9 +35,14 @@ TODO
                     <version>${mysql.version}</version>
                 </dependency>
                 <dependency>
-                    <groupId>org.mybatis.spring.boot</groupId>
-                    <artifactId>mybatis-spring-boot-starter</artifactId>
+                    <groupId>org.mybatis</groupId>
+                    <artifactId>mybatis</artifactId>
                     <version>${mybatis.version}</version>
+                </dependency>
+                <dependency>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                    <version>${lombok.version}</version>
                 </dependency>
             </dependencies>
             <configuration>

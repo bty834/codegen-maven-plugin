@@ -1,9 +1,7 @@
 package codegen.gen;
 
 import java.util.Set;
-
 import org.apache.maven.plugin.MojoExecutionException;
-
 import codegen.config.ConfigProperties;
 import codegen.table.Table;
 

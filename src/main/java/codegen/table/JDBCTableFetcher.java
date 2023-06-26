@@ -12,6 +12,9 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.checkerframework.checker.nullness.qual.Nullable;
+
+import com.google.common.collect.Sets;
 
 import codegen.config.ConfigProperties;
 
@@ -26,23 +29,24 @@ public class JDBCTableFetcher implements TableFetcher {
         HashSet<Table> tables = new HashSet<>();
 
         Set<String> excludedTables = new HashSet<>();
-        if(Objects.nonNull(configProperties.getExcludedTables()) && configProperties.getExcludedTables().length>0){
+        if (Objects.nonNull(configProperties.getExcludedTables()) && configProperties.getExcludedTables().length > 0) {
             excludedTables.addAll(Arrays.asList(configProperties.getExcludedTables()));
         }
 
         Class.forName(configProperties.getDriver());
 
-        try (Connection conn = DriverManager.getConnection(configProperties.getJdbcUrl(), configProperties.getUsername(),
-                configProperties.getPassword());){
+        try (Connection conn = DriverManager.getConnection(configProperties.getJdbcUrl(),
+                configProperties.getUsername(),
+                configProperties.getPassword());) {
             String dbName = extractDbFromUrl(configProperties.getJdbcUrl());
 
             DatabaseMetaData metaData = conn.getMetaData();
             ResultSet tableResultSet = metaData.getTables(dbName, dbName, null, new String[] {"TABLE"});
 
 
-            while(tableResultSet.next()){
+            while (tableResultSet.next()) {
                 String tableName = tableResultSet.getString(3);
-                if(excludedTables.contains(tableName)){
+                if (excludedTables.contains(tableName)) {
                     continue;
                 }
 
@@ -51,7 +55,21 @@ public class JDBCTableFetcher implements TableFetcher {
 
                 String primaryKeyColumnName = "";
                 ResultSet primaryKeyResultSet = metaData.getPrimaryKeys(dbName, dbName, tableName);
-                while (primaryKeyResultSet.next()){
+
+                Set<@Nullable String> uniqIndexColumnNames = Sets.newHashSet();
+                ResultSet uniqIndexResultSet = metaData.getIndexInfo(dbName, dbName, tableName, true, true);
+                while (uniqIndexResultSet.next()) {
+                    uniqIndexColumnNames.add(uniqIndexResultSet.getString(9));
+                }
+
+                Set<@Nullable Object> indexColumnNames = Sets.newHashSet();
+                ResultSet indexResultSet = metaData.getIndexInfo(dbName, dbName, tableName, false, true);
+                while (indexResultSet.next()) {
+                    indexColumnNames.add(indexResultSet.getString(9));
+                }
+
+
+                while (primaryKeyResultSet.next()) {
                     primaryKeyColumnName = primaryKeyResultSet.getString(4);
                 }
 
@@ -65,17 +83,18 @@ public class JDBCTableFetcher implements TableFetcher {
                     c.setColumnSize(columns.getInt(7));
                     c.setNullable(columns.getBoolean(11));
                     c.setAutoIncrement(columns.getBoolean(23));
+                    c.setIndexed(indexColumnNames.contains(c.getColumnName()));
+                    c.setUniqIndexed(uniqIndexColumnNames.contains(c.getColumnName()));
 
-
-                    if(c.getColumnName().equals(primaryKeyColumnName)){
+                    if (c.getColumnName().equals(primaryKeyColumnName)) {
                         table.setPrimaryKeyColumn(c);
                     }
+
                     table.addColumn(c);
                 }
-                if(Objects.isNull(table.getPrimaryKeyColumn())){
-                    throw new MojoExecutionException("require a primary key in table : "+table.getName());
+                if (Objects.isNull(table.getPrimaryKeyColumn())) {
+                    throw new MojoExecutionException("require a primary key in table : " + table.getName());
                 }
-
 
                 tables.add(table);
             }

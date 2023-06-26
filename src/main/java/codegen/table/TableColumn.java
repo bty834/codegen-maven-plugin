@@ -24,6 +24,34 @@ public class TableColumn {
 
     private boolean isAutoIncrement;
 
+    private boolean indexed;
+
+    private boolean uniqIndexed;
+
+    public void setDataType(int dataType) {
+        this.dataType = dataType;
+    }
+
+    public void setColumnSize(int columnSize) {
+        this.columnSize = columnSize;
+    }
+
+    public boolean isIndexed() {
+        return indexed;
+    }
+
+    public void setIndexed(boolean indexed) {
+        this.indexed = indexed;
+    }
+
+    public boolean isUniqIndexed() {
+        return uniqIndexed;
+    }
+
+    public void setUniqIndexed(boolean uniqIndexed) {
+        this.uniqIndexed = uniqIndexed;
+    }
+
     public String getColumnName() {
         return columnName;
     }
