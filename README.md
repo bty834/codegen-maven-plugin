@@ -46,7 +46,7 @@ TODO: 查询用的 Example实体类 和 mapper XML
                 </dependency>
             </dependencies>
             <configuration>
-                <absoluteFilePath>/Users/mac/IdeaProjects/java-maven-sample/src/main/resources/sample.yaml</absoluteFilePath>
+                <absoluteFilePath>${yaml配置文件绝对路径}</absoluteFilePath>
                 <skip>false</skip>
             </configuration>
         </plugin>
@@ -56,4 +56,11 @@ TODO: 查询用的 Example实体类 和 mapper XML
 
 2. 配置文件：参见resource目录下sample.yaml。目前仅支持yaml/yml
 
-TODO: XML生成
+3. QueryExample目前日期类型转化为String.class，且支持and的where条件，条件通过${}字符串拼接，非#{}。另外，表结构只支持一个主键列。
+```java
+PeopleQueryExample example = PeopleQueryExample.newExample()
+                .updateTimeGt("2023-06-20")
+                .nameIn(Arrays.asList("name_1", "name_2"))
+                .numberLte(10000);
+```
+4. TODO: XML生成

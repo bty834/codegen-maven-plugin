@@ -2,8 +2,6 @@ package codegen.gen;
 
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.sql.Date;
-import java.sql.Time;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -48,7 +46,23 @@ import lombok.ToString;
  * @date: 2023/6/25
  **/
 public class JavapoetGenerator extends AbstractCodeGenerator {
+    private final static ParameterSpec INT_PARAM = ParameterSpec.builder(Integer.class, "value").build();
+    private final static ParameterSpec LONG_PARAM = ParameterSpec.builder(Long.class, "value").build();
+    private final static ParameterSpec STRING_PARAM = ParameterSpec.builder(String.class, "value").build();
+    private final static ParameterSpec FLOAT_PARAM = ParameterSpec.builder(Float.class, "value").build();
+    private final static ParameterSpec DOUBLE_PARAM = ParameterSpec.builder(Double.class, "value").build();
 
+
+    private final static ParameterSpec INT_LIST_PARAM =
+            ParameterSpec.builder(ParameterizedTypeName.get(List.class, Integer.class), "list").build();
+    private final static ParameterSpec LONG_LIST_PARAM =
+            ParameterSpec.builder(ParameterizedTypeName.get(List.class, Long.class), "list").build();
+    private final static ParameterSpec STRING_LIST_PARAM =
+            ParameterSpec.builder(ParameterizedTypeName.get(List.class, String.class), "list").build();
+    private final static ParameterSpec FLOAT_LIST_PARAM =
+            ParameterSpec.builder(ParameterizedTypeName.get(List.class, Float.class), "list").build();
+    private final static ParameterSpec DOUBLE_LIST_PARAM =
+            ParameterSpec.builder(ParameterizedTypeName.get(List.class, Double.class), "list").build();
 
     @Override
     public void generate(ConfigProperties configProperties, Set<Table> tables) throws MojoExecutionException {
@@ -89,160 +103,253 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
     }
 
     private void generateConditionUtil() {
-        String conditionUtilClassName = "ConditionUtil";
+        final String conditionUtilClassName = "ConditionUtil";
 
         Builder builder = TypeSpec
                 .classBuilder(conditionUtilClassName)
                 .addModifiers(Modifier.PUBLIC);
 
         ParameterSpec columnSpec = ParameterSpec.builder(String.class, "column").build();
-        ParameterSpec intSpec = ParameterSpec.builder(Integer.class, "value").build();
-        ParameterSpec longSpec = ParameterSpec.builder(Long.class, "value").build();
-        ParameterSpec stringSpec = ParameterSpec.builder(String.class, "value").build();
-        ParameterSpec dateSpec = ParameterSpec.builder(Date.class, "value").build();
-        ParameterSpec dateTimeSpec = ParameterSpec.builder(Time.class, "value").build();
 
-        String inStatement = "   List<String> collect = in.stream().map(String::valueOf).collect($T.toList());\n"
+        final String inStatement = "   List<String> collect = list.stream().map(String::valueOf).collect($T.toList());\n"
                 + "        String join = String.join(\",\", collect);\n"
                 + "        return column+\" in (\"+join+\")\";";
-        String notInStatement = "   List<String> collect = in.stream().map(String::valueOf).collect($T.toList());\n"
-                + "        String join = String.join(\",\", collect);\n"
-                + "        return column+\" not in (\"+join+\")\";";
+        final String notInStatement =
+                "   List<String> collect = list.stream().map(String::valueOf).collect($T.toList());\n"
+                        + "        String join = String.join(\",\", collect);\n"
+                        + "        return column+\" not in (\"+join+\")\";";
 
+        //<editor-fold desc="int method">
         MethodSpec intGte = MethodSpec.methodBuilder("intGte")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(intSpec)
+                .addParameter(INT_PARAM)
                 .addStatement("return column + \">=\" + value")
                 .returns(String.class).build();
         MethodSpec intGt = MethodSpec.methodBuilder("intGt")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(intSpec)
+                .addParameter(INT_PARAM)
                 .addStatement("return column + \">\" + value")
                 .returns(String.class).build();
         MethodSpec intLte = MethodSpec.methodBuilder("intLte")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(intSpec)
+                .addParameter(INT_PARAM)
                 .addStatement("return column + \"<=\" + value")
                 .returns(String.class).build();
         MethodSpec intLt = MethodSpec.methodBuilder("intLt")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(intSpec)
+                .addParameter(INT_PARAM)
                 .addStatement("return column + \"<\" + value")
                 .returns(String.class).build();
         MethodSpec intEquals = MethodSpec.methodBuilder("intEquals")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(intSpec)
+                .addParameter(INT_PARAM)
                 .addStatement("return column+\"=\"+value")
                 .returns(String.class).build();
         MethodSpec intIn = MethodSpec.methodBuilder("intIn")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), "in")
+                .addParameter(INT_LIST_PARAM)
                 .addCode(CodeBlock.builder().add(inStatement, Collectors.class).build())
                 .returns(String.class).build();
         MethodSpec intNotIn = MethodSpec.methodBuilder("intNotIn")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Integer.class)), "in")
+                .addParameter(INT_LIST_PARAM)
                 .addCode(CodeBlock.builder().add(notInStatement, Collectors.class).build())
                 .returns(String.class).build();
+        //</editor-fold>
 
+        //<editor-fold desc="long method">
         MethodSpec longGte = MethodSpec.methodBuilder("longGte")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(longSpec)
+                .addParameter(LONG_PARAM)
                 .addStatement("return column + \">=\" + value")
                 .returns(String.class).build();
         MethodSpec longGt = MethodSpec.methodBuilder("longGt")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(longSpec)
+                .addParameter(LONG_PARAM)
                 .addStatement("return column + \">\" + value")
                 .returns(String.class).build();
         MethodSpec longLte = MethodSpec.methodBuilder("longLte")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(longSpec)
+                .addParameter(LONG_PARAM)
                 .addStatement("return column + \"<=\" + value")
                 .returns(String.class).build();
         MethodSpec longLt = MethodSpec.methodBuilder("longLt")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(longSpec)
+                .addParameter(LONG_PARAM)
                 .addStatement("return column + \"<\" + value")
                 .returns(String.class).build();
         MethodSpec longEquals = MethodSpec.methodBuilder("longEquals")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(longSpec)
+                .addParameter(LONG_PARAM)
                 .addStatement("return column+\"=\"+value")
                 .returns(String.class).build();
         MethodSpec longIn = MethodSpec.methodBuilder("longIn")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Long.class)), "in")
+                .addParameter(LONG_LIST_PARAM)
                 .addCode(CodeBlock.builder().add(inStatement, Collectors.class).build())
                 .returns(String.class).build();
         MethodSpec longNotIn = MethodSpec.methodBuilder("longNotIn")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(Long.class)), "in")
+                .addParameter(LONG_LIST_PARAM)
                 .addCode(CodeBlock.builder().add(notInStatement, Collectors.class).build())
                 .returns(String.class).build();
+        //</editor-fold>
 
-
+        //<editor-fold desc="string method">
         MethodSpec stringGte = MethodSpec.methodBuilder("stringGte")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(stringSpec)
+                .addParameter(STRING_PARAM)
                 .addStatement("return column + \">=\" + value")
                 .returns(String.class).build();
         MethodSpec stringGt = MethodSpec.methodBuilder("stringGt")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(stringSpec)
+                .addParameter(STRING_PARAM)
                 .addStatement("return column + \">\" + value")
                 .returns(String.class).build();
         MethodSpec stringLte = MethodSpec.methodBuilder("stringLte")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(stringSpec)
+                .addParameter(STRING_PARAM)
                 .addStatement("return column + \"<=\" + value")
                 .returns(String.class).build();
         MethodSpec stringLt = MethodSpec.methodBuilder("stringLt")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(stringSpec)
+                .addParameter(STRING_PARAM)
                 .addStatement("return column + \"<\" + value")
                 .returns(String.class).build();
         MethodSpec stringEquals = MethodSpec.methodBuilder("stringEquals")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(stringSpec)
+                .addParameter(STRING_PARAM)
                 .addStatement("return column+\"=\"+value")
                 .returns(String.class).build();
         MethodSpec stringIn = MethodSpec.methodBuilder("stringIn")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(String.class)), "in")
+                .addParameter(STRING_LIST_PARAM)
                 .addCode(CodeBlock.builder().add(inStatement, Collectors.class).build())
                 .returns(String.class).build();
         MethodSpec stringNotIn = MethodSpec.methodBuilder("stringNotIn")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addParameter(columnSpec)
-                .addParameter(ParameterizedTypeName.get(ClassName.get(List.class), ClassName.get(String.class)), "in")
+                .addParameter(STRING_LIST_PARAM)
                 .addCode(CodeBlock.builder().add(notInStatement, Collectors.class).build())
                 .returns(String.class).build();
+        //</editor-fold>
+
+        //<editor-fold desc="float method">
+        MethodSpec floatGte = MethodSpec.methodBuilder("floatGte")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(FLOAT_PARAM)
+                .addStatement("return column + \">=\" + value")
+                .returns(String.class).build();
+        MethodSpec floatGt = MethodSpec.methodBuilder("floatGt")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(FLOAT_PARAM)
+                .addStatement("return column + \">\" + value")
+                .returns(String.class).build();
+        MethodSpec floatLte = MethodSpec.methodBuilder("floatLte")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(FLOAT_PARAM)
+                .addStatement("return column + \"<=\" + value")
+                .returns(String.class).build();
+        MethodSpec floatLt = MethodSpec.methodBuilder("floatLt")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(FLOAT_PARAM)
+                .addStatement("return column + \"<\" + value")
+                .returns(String.class).build();
+        MethodSpec floatEquals = MethodSpec.methodBuilder("floatEquals")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(FLOAT_PARAM)
+                .addStatement("return column+\"=\"+value")
+                .returns(String.class).build();
+        MethodSpec floatIn = MethodSpec.methodBuilder("floatIn")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(FLOAT_LIST_PARAM)
+                .addCode(CodeBlock.builder().add(inStatement, Collectors.class).build())
+                .returns(String.class).build();
+        MethodSpec floatNotIn = MethodSpec.methodBuilder("floatNotIn")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(FLOAT_LIST_PARAM)
+                .addCode(CodeBlock.builder().add(notInStatement, Collectors.class).build())
+                .returns(String.class).build();
+        //</editor-fold>
+
+        //<editor-fold desc="double method">
+        MethodSpec doubleGte = MethodSpec.methodBuilder("doubleGte")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(DOUBLE_PARAM)
+                .addStatement("return column + \">=\" + value")
+                .returns(String.class).build();
+        MethodSpec doubleGt = MethodSpec.methodBuilder("doubleGt")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(DOUBLE_PARAM)
+                .addStatement("return column + \">\" + value")
+                .returns(String.class).build();
+        MethodSpec doubleLte = MethodSpec.methodBuilder("doubleLte")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(DOUBLE_PARAM)
+                .addStatement("return column + \"<=\" + value")
+                .returns(String.class).build();
+        MethodSpec doubleLt = MethodSpec.methodBuilder("doubleLt")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(DOUBLE_PARAM)
+                .addStatement("return column + \"<\" + value")
+                .returns(String.class).build();
+        MethodSpec doubleEquals = MethodSpec.methodBuilder("doubleEquals")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(DOUBLE_PARAM)
+                .addStatement("return column+\"=\"+value")
+                .returns(String.class).build();
+        MethodSpec doubleIn = MethodSpec.methodBuilder("doubleIn")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(DOUBLE_LIST_PARAM)
+                .addCode(CodeBlock.builder().add(inStatement, Collectors.class).build())
+                .returns(String.class).build();
+        MethodSpec doubleNotIn = MethodSpec.methodBuilder("doubleNotIn")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .addParameter(columnSpec)
+                .addParameter(DOUBLE_LIST_PARAM)
+                .addCode(CodeBlock.builder().add(notInStatement, Collectors.class).build())
+                .returns(String.class).build();
+        //</editor-fold>
 
         ArrayList<MethodSpec> methodSpecs = Lists.newArrayList(
                 intGte, intGt, intLte, intLt, intEquals, intIn, intNotIn,
                 longGte, longGt, longLte, longLt, longEquals, longIn, longNotIn,
-                stringGte, stringGt, stringLte, stringLt, stringEquals, stringIn, stringNotIn
+                stringGte, stringGt, stringLte, stringLt, stringEquals, stringIn, stringNotIn,
+                floatGte, floatGt, floatLte, floatLt, floatEquals, floatIn, floatNotIn,
+                doubleGte, doubleGt, doubleLte, doubleLt, doubleEquals, doubleIn, doubleNotIn
         );
         builder.addMethods(methodSpecs);
         persistTypeSpec(this.configProperties.getMapperInterfaceGenPkg(), Collections.singletonList(builder.build()));
@@ -308,9 +415,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
                         .addAnnotation(Getter.class).build();
         builder.addField(whereClause);
 
-        MethodSpec nonArgsConstructor = MethodSpec.methodBuilder(exampleSimpleName)
-                .addModifiers(Modifier.PRIVATE)
-                .build();
+        MethodSpec nonArgsConstructor = MethodSpec.constructorBuilder().addModifiers(Modifier.PRIVATE).build();
         MethodSpec newExample = MethodSpec.methodBuilder("newExample")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .addCode(CodeBlock.of("return new " + exampleSimpleName + "();"))
@@ -321,17 +426,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
         Set<TableColumn> columns = table.getColumns();
 
-        ParameterSpec intParamSpec = ParameterSpec.builder(Integer.class, "value").build();
-        ParameterSpec longParamSpec = ParameterSpec.builder(Long.class, "value").build();
-        ParameterSpec stringParamSpec = ParameterSpec.builder(String.class, "value").build();
 
-
-        ParameterSpec intListParamSpec =
-                ParameterSpec.builder(ParameterizedTypeName.get(List.class, Integer.class), "list").build();
-        ParameterSpec longListParamSpec =
-                ParameterSpec.builder(ParameterizedTypeName.get(List.class, Long.class), "list").build();
-        ParameterSpec stringListParamSpec =
-                ParameterSpec.builder(ParameterizedTypeName.get(List.class, String.class), "list").build();
 
         for (TableColumn column : columns) {
             String fieldName = mapUnderScoreToLowerCamelCase(column.getColumnName());
@@ -340,7 +435,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
             if (aClass.equals(Integer.class)) {
                 MethodSpec equals = MethodSpec.methodBuilder(fieldName + "Equals")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(intParamSpec)
+                        .addParameter(INT_PARAM)
                         .addCode("whereClause.add( $T.intEquals(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -348,7 +443,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec gte = MethodSpec.methodBuilder(fieldName + "Gte")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(intParamSpec)
+                        .addParameter(INT_PARAM)
                         .addCode("whereClause.add( $T.intGte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -356,7 +451,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec gt = MethodSpec.methodBuilder(fieldName + "Gt")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(intParamSpec)
+                        .addParameter(INT_PARAM)
                         .addCode("whereClause.add( $T.intGt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -364,14 +459,14 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec lte = MethodSpec.methodBuilder(fieldName + "Lte")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(intParamSpec)
+                        .addParameter(INT_PARAM)
                         .addCode("whereClause.add( $T.intLte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
                         .build();
                 MethodSpec lt = MethodSpec.methodBuilder(fieldName + "Lt")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(intParamSpec)
+                        .addParameter(INT_PARAM)
                         .addCode("whereClause.add( $T.intLt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -379,7 +474,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec in = MethodSpec.methodBuilder(fieldName + "In")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(intListParamSpec)
+                        .addParameter(INT_LIST_PARAM)
                         .addCode("whereClause.add( $T.intIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -387,19 +482,19 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec notIn = MethodSpec.methodBuilder(fieldName + "NotIn")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(intListParamSpec)
+                        .addParameter(INT_LIST_PARAM)
                         .addCode("whereClause.add( $T.intNotIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
                         .build();
 
-                builder.addMethods(Lists.newArrayList(equals,gte,gt,lte,lt,in,notIn));
+                builder.addMethods(Lists.newArrayList(equals, gte, gt, lte, lt, in, notIn));
             }
 
             if (aClass.equals(Long.class)) {
                 MethodSpec equals = MethodSpec.methodBuilder(fieldName + "Equals")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(longParamSpec)
+                        .addParameter(LONG_PARAM)
                         .addCode(
                                 "whereClause.add( $T.longEquals(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                         + "return this;", conditionUtilClassName)
@@ -408,7 +503,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec gte = MethodSpec.methodBuilder(fieldName + "Gte")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(longParamSpec)
+                        .addParameter(LONG_PARAM)
                         .addCode("whereClause.add( $T.longGte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -416,7 +511,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec gt = MethodSpec.methodBuilder(fieldName + "Gt")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(longParamSpec)
+                        .addParameter(LONG_PARAM)
                         .addCode("whereClause.add( $T.longGt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -424,14 +519,14 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec lte = MethodSpec.methodBuilder(fieldName + "Lte")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(longParamSpec)
+                        .addParameter(LONG_PARAM)
                         .addCode("whereClause.add( $T.longLte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
                         .build();
                 MethodSpec lt = MethodSpec.methodBuilder(fieldName + "Lt")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(longParamSpec)
+                        .addParameter(LONG_PARAM)
                         .addCode("whereClause.add( $T.longLt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -439,7 +534,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec in = MethodSpec.methodBuilder(fieldName + "In")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(longListParamSpec)
+                        .addParameter(LONG_LIST_PARAM)
                         .addCode("whereClause.add( $T.longIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -447,18 +542,18 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec notIn = MethodSpec.methodBuilder(fieldName + "NotIn")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(longListParamSpec)
+                        .addParameter(LONG_LIST_PARAM)
                         .addCode("whereClause.add( $T.longNotIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
                         .build();
-                builder.addMethods(Lists.newArrayList(equals,gte,gt,lte,lt,in,notIn));
+                builder.addMethods(Lists.newArrayList(equals, gte, gt, lte, lt, in, notIn));
             }
 
             if (aClass.equals(String.class)) {
                 MethodSpec equals = MethodSpec.methodBuilder(fieldName + "Equals")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(stringParamSpec)
+                        .addParameter(STRING_PARAM)
                         .addCode("whereClause.add( $T.stringEquals(" + "\"" + column.getColumnName() + "\""
                                 + ",value));\n"
                                 + "return this;", conditionUtilClassName)
@@ -467,7 +562,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec gte = MethodSpec.methodBuilder(fieldName + "Gte")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(stringParamSpec)
+                        .addParameter(STRING_PARAM)
                         .addCode("whereClause.add( $T.stringGte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -475,7 +570,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec gt = MethodSpec.methodBuilder(fieldName + "Gt")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(stringParamSpec)
+                        .addParameter(STRING_PARAM)
                         .addCode("whereClause.add( $T.stringGt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -483,14 +578,14 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec lte = MethodSpec.methodBuilder(fieldName + "Lte")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(stringParamSpec)
+                        .addParameter(STRING_PARAM)
                         .addCode("whereClause.add( $T.stringLte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
                         .build();
                 MethodSpec lt = MethodSpec.methodBuilder(fieldName + "Lt")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(stringParamSpec)
+                        .addParameter(STRING_PARAM)
                         .addCode("whereClause.add( $T.stringLt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -498,7 +593,7 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec in = MethodSpec.methodBuilder(fieldName + "In")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(stringListParamSpec)
+                        .addParameter(STRING_LIST_PARAM)
                         .addCode("whereClause.add( $T.stringIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
                                 + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
@@ -506,21 +601,133 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
 
                 MethodSpec notIn = MethodSpec.methodBuilder(fieldName + "NotIn")
                         .addModifiers(Modifier.PUBLIC)
-                        .addParameter(stringListParamSpec)
+                        .addParameter(STRING_LIST_PARAM)
                         .addCode(
                                 "whereClause.add( $T.stringNotIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
                                         + "return this;", conditionUtilClassName)
                         .returns(exampleClassName)
                         .build();
-                builder.addMethods(Lists.newArrayList(equals,gte,gt,lte,lt,in,notIn));
+                builder.addMethods(Lists.newArrayList(equals, gte, gt, lte, lt, in, notIn));
             }
 
-            if(aClass.equals(Float.class)){
-                // TODO
+            if (aClass.equals(Float.class)) {
+                MethodSpec equals = MethodSpec.methodBuilder(fieldName + "Equals")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(FLOAT_PARAM)
+                        .addCode("whereClause.add( $T.floatEquals(" + "\"" + column.getColumnName() + "\""
+                                + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec gte = MethodSpec.methodBuilder(fieldName + "Gte")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(FLOAT_PARAM)
+                        .addCode("whereClause.add( $T.floatGte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec gt = MethodSpec.methodBuilder(fieldName + "Gt")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(FLOAT_PARAM)
+                        .addCode("whereClause.add( $T.floatGt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec lte = MethodSpec.methodBuilder(fieldName + "Lte")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(FLOAT_PARAM)
+                        .addCode("whereClause.add( $T.floatLte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+                MethodSpec lt = MethodSpec.methodBuilder(fieldName + "Lt")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(FLOAT_PARAM)
+                        .addCode("whereClause.add( $T.floatLt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec in = MethodSpec.methodBuilder(fieldName + "In")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(FLOAT_LIST_PARAM)
+                        .addCode("whereClause.add( $T.floatIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec notIn = MethodSpec.methodBuilder(fieldName + "NotIn")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(FLOAT_LIST_PARAM)
+                        .addCode(
+                                "whereClause.add( $T.floatNotIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
+                                        + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+                builder.addMethods(Lists.newArrayList(equals, gte, gt, lte, lt, in, notIn));
             }
 
-            if(aClass.equals(Double.class)){
-                // TODO
+            if (aClass.equals(Double.class)) {
+                MethodSpec equals = MethodSpec.methodBuilder(fieldName + "Equals")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(DOUBLE_PARAM)
+                        .addCode("whereClause.add( $T.doubleEquals(" + "\"" + column.getColumnName() + "\""
+                                + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec gte = MethodSpec.methodBuilder(fieldName + "Gte")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(DOUBLE_PARAM)
+                        .addCode("whereClause.add( $T.doubleGte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec gt = MethodSpec.methodBuilder(fieldName + "Gt")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(DOUBLE_PARAM)
+                        .addCode("whereClause.add( $T.doubleGt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec lte = MethodSpec.methodBuilder(fieldName + "Lte")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(DOUBLE_PARAM)
+                        .addCode("whereClause.add( $T.doubleLte(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+                MethodSpec lt = MethodSpec.methodBuilder(fieldName + "Lt")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(DOUBLE_PARAM)
+                        .addCode("whereClause.add( $T.doubleLt(" + "\"" + column.getColumnName() + "\"" + ",value));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec in = MethodSpec.methodBuilder(fieldName + "In")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(DOUBLE_LIST_PARAM)
+                        .addCode("whereClause.add( $T.doubleIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
+                                + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+
+                MethodSpec notIn = MethodSpec.methodBuilder(fieldName + "NotIn")
+                        .addModifiers(Modifier.PUBLIC)
+                        .addParameter(DOUBLE_LIST_PARAM)
+                        .addCode(
+                                "whereClause.add( $T.doubleNotIn(" + "\"" + column.getColumnName() + "\"" + ",list));\n"
+                                        + "return this;", conditionUtilClassName)
+                        .returns(exampleClassName)
+                        .build();
+                builder.addMethods(Lists.newArrayList(equals, gte, gt, lte, lt, in, notIn));
             }
         }
 
@@ -718,7 +925,9 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
             String fieldName = mapUnderScoreToLowerCamelCase(column.getColumnName());
             Class<?> fieldJavaType = convertJDBCTypetoClass(column.getDataType());
             FieldSpec build = FieldSpec.builder(fieldJavaType, fieldName, Modifier.PRIVATE)
-                    .addJavadoc(CodeBlock.of( (isPk?"primaryKey":"")+" | "+"indexed:" + column.isIndexed() + " | " + "uniqIndexed:" + column.isUniqIndexed() + " | "
+                    .addJavadoc(CodeBlock.of(
+                            (isPk ? "primaryKey | " : "") + "indexed:" + column.isIndexed() + " | "
+                                    + "uniqIndexed:" + column.isUniqIndexed() + " | "
                                     + "size:" + column.getColumnSize() + " | " + "nullable:" + column.isNullable()
                                     + " | " + "autoIncrement:" + column.isAutoIncrement()))
                     .build();

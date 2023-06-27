@@ -93,8 +93,6 @@ public abstract class AbstractCodeGenerator implements CodeGenerator {
                 result = java.math.BigDecimal.class;
                 break;
             case Types.BIT:
-                result = Boolean.class;
-                break;
             case Types.TINYINT:
             case Types.SMALLINT:
             case Types.INTEGER:
