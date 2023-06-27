@@ -1,4 +1,12 @@
-package codegen.gen;
+package codegen.gen.java;
+
+import static codegen.gen.CommonUtil.JAVA_DOC;
+import static codegen.gen.CommonUtil.convertJDBCTypetoClass;
+import static codegen.gen.CommonUtil.getAbsolutePathForPkg;
+import static codegen.gen.CommonUtil.getAbsolutePathForSrcMainJava;
+import static codegen.gen.CommonUtil.mapUnderScoreToLowerCamelCase;
+import static codegen.gen.CommonUtil.mapUnderScoreToUpperCamelCase;
+import static codegen.gen.CommonUtil.prepareDir;
 
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -9,6 +17,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -45,7 +54,7 @@ import lombok.ToString;
  * @author: baotingyu
  * @date: 2023/6/25
  **/
-public class JavapoetGenerator extends AbstractCodeGenerator {
+public class JavapoetGenerator implements CodeGenerator{
     private final static ParameterSpec INT_PARAM = ParameterSpec.builder(Integer.class, "value").build();
     private final static ParameterSpec LONG_PARAM = ParameterSpec.builder(Long.class, "value").build();
     private final static ParameterSpec STRING_PARAM = ParameterSpec.builder(String.class, "value").build();
@@ -64,9 +73,13 @@ public class JavapoetGenerator extends AbstractCodeGenerator {
     private final static ParameterSpec DOUBLE_LIST_PARAM =
             ParameterSpec.builder(ParameterizedTypeName.get(List.class, Double.class), "list").build();
 
+    protected ConfigProperties configProperties;
+
     @Override
     public void generate(ConfigProperties configProperties, Set<Table> tables) throws MojoExecutionException {
-
+        if(Objects.isNull(tables) || tables.size()==0){
+            return;
+        }
         if (StringUtils.isBlank(configProperties.getEntityGenPkg()) ||
                 StringUtils.isBlank(configProperties.getMapperInterfaceGenPkg()) ||
                 StringUtils.isBlank(configProperties.getMapperXmlGenAbsPath())) {

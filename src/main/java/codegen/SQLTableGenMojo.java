@@ -15,7 +15,8 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-import codegen.gen.CodeGenerator;
+import codegen.gen.java.CodeGenerator;
+import codegen.gen.xml.XMLGenerator;
 import codegen.table.Table;
 import codegen.parser.ConfigFileParser;
 import codegen.table.TableFetcher;
@@ -75,6 +76,9 @@ public class SQLTableGenMojo extends AbstractMojo {
         CodeGenerator codeGenerator = codeGenerator();
         codeGenerator.generate(configProperties,tables);
 
+        XMLGenerator xmlGenerator = xmlGenerator();
+        xmlGenerator.generate(configProperties,tables);
+
     }
 
     private CodeGenerator codeGenerator() throws MojoExecutionException {
@@ -83,6 +87,14 @@ public class SQLTableGenMojo extends AbstractMojo {
             return generator;
         }
         throw new MojoExecutionException("Failed to generate code: unsupported codegenerator");
+    }
+
+    public XMLGenerator xmlGenerator() throws MojoExecutionException {
+        ServiceLoader<XMLGenerator> xmlGenerators = ServiceLoader.load(XMLGenerator.class);
+        for (XMLGenerator xmlGenerator : xmlGenerators) {
+            return xmlGenerator;
+        }
+        throw new MojoExecutionException("Failed to generate code: unsupported xmlgenerator");
     }
 
     private Set<Table> fetchTableInfo(ConfigProperties configProperties) throws Exception {
