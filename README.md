@@ -7,8 +7,9 @@ Java类生成使用javapoet
 ![](doc/image/entity.png)
 ## mapper
 ![](doc/image/mapper.png)
+## xml
+![](doc/image/xml.png)
 
-TODO: 查询用的 Example实体类 和 mapper XML
 
 # 使用
 1. 引入build
@@ -63,4 +64,3 @@ PeopleQueryExample example = PeopleQueryExample.newExample()
                 .nameIn(Arrays.asList("name_1", "name_2"))
                 .numberLte(10000);
 ```
-4. TODO: XML生成
