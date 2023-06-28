@@ -1,6 +1,8 @@
 自定义Maven插件生成MyBatis实体类、Mapper、XML
 
-Java类生成使用javapoet
+Java类生成使用 javapoet
+
+XML文件生成使用 jdom2
 
 # 示例
 ## entity
