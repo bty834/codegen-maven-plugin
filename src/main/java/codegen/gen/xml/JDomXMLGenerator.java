@@ -127,12 +127,12 @@ public class JDomXMLGenerator implements XMLGenerator{
 
         Element orderIfAsc = new Element("if");
         orderIfAsc.setAttribute("test"," page.isAsc=null or page.isAsc=true ");
-        orderIfAsc.addContent(" order by sort.fieldName asc ");
+        orderIfAsc.addContent(" order by ${sort.fieldName} asc ");
         orderIf.addContent(orderIfAsc);
 
         Element orderIfDesc = new Element("if");
         orderIfDesc.setAttribute("test"," page.isAsc!=null or page.isAsc=false ");
-        orderIfDesc.addContent(" order by sort.fieldName desc ");
+        orderIfDesc.addContent(" order by ${sort.fieldName} desc ");
         orderIf.addContent(orderIfDesc);
 
         select.addContent(orderIf);
