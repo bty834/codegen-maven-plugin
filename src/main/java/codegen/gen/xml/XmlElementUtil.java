@@ -42,7 +42,7 @@ public class XmlElementUtil {
         fieldNames.forEach(fieldName -> {
             Element ifEle = new Element("if");
             ifEle.setAttribute("test", param+"."+CommonUtil.mapUnderScoreToLowerCamelCase(fieldName)+"!=null");
-            ifEle.addContent("#{"+param+"."+CommonUtil.mapUnderScoreToLowerCamelCase(fieldName)+"}");
+            ifEle.addContent("#{"+param+"."+CommonUtil.mapUnderScoreToLowerCamelCase(fieldName)+"},");
 
             trim.addContent(ifEle);
         });
@@ -50,16 +50,33 @@ public class XmlElementUtil {
         return trim;
     }
 
-    public Element updateSetOfIfList(String param,List<String> fieldNames){
+
+    public static Element updateSetOfIfList(String param,List<String> fieldNames){
         Element set = new Element("set");
 
         fieldNames.forEach(fieldName -> {
             Element ifEle = new Element("if");
             ifEle.setAttribute("test", CommonUtil.mapUnderScoreToLowerCamelCase(fieldName)+"!=null");
-            ifEle.addContent(fieldName + "= #{"+param+"."+CommonUtil.mapUnderScoreToLowerCamelCase(fieldName)+"}");
+            ifEle.addContent(fieldName + "= #{"+param+"."+CommonUtil.mapUnderScoreToLowerCamelCase(fieldName)+"}"+",");
 
             set.addContent(ifEle);
         });
         return set;
     }
+
+    public static Element example(){
+        Element where = new Element("where");
+
+        Element foreach = new Element("foreach");
+        where.addContent(foreach);
+
+        foreach.setAttribute("collection","example.whereClause");
+        foreach.setAttribute("item","item");
+        foreach.setAttribute("separator","and");
+
+        foreach.addContent(" ${item}");
+        return where;
+    }
+
+
 }

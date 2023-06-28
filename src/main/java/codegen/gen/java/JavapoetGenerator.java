@@ -54,7 +54,7 @@ import lombok.ToString;
  * @author: baotingyu
  * @date: 2023/6/25
  **/
-public class JavapoetGenerator implements CodeGenerator{
+public class JavapoetGenerator implements CodeGenerator {
     private final static ParameterSpec INT_PARAM = ParameterSpec.builder(Integer.class, "value").build();
     private final static ParameterSpec LONG_PARAM = ParameterSpec.builder(Long.class, "value").build();
     private final static ParameterSpec STRING_PARAM = ParameterSpec.builder(String.class, "value").build();
@@ -77,7 +77,7 @@ public class JavapoetGenerator implements CodeGenerator{
 
     @Override
     public void generate(ConfigProperties configProperties, Set<Table> tables) throws MojoExecutionException {
-        if(Objects.isNull(tables) || tables.size()==0){
+        if (Objects.isNull(tables) || tables.size() == 0) {
             return;
         }
         if (StringUtils.isBlank(configProperties.getEntityGenPkg()) ||
@@ -124,9 +124,10 @@ public class JavapoetGenerator implements CodeGenerator{
 
         ParameterSpec columnSpec = ParameterSpec.builder(String.class, "column").build();
 
-        final String inStatement = "   List<String> collect = list.stream().map(String::valueOf).collect($T.toList());\n"
-                + "        String join = String.join(\",\", collect);\n"
-                + "        return column+\" in (\"+join+\")\";";
+        final String inStatement =
+                "   List<String> collect = list.stream().map(String::valueOf).collect($T.toList());\n"
+                        + "        String join = String.join(\",\", collect);\n"
+                        + "        return column+\" in (\"+join+\")\";";
         final String notInStatement =
                 "   List<String> collect = list.stream().map(String::valueOf).collect($T.toList());\n"
                         + "        String join = String.join(\",\", collect);\n"
@@ -377,8 +378,8 @@ public class JavapoetGenerator implements CodeGenerator{
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(lombok.Builder.class)
                 .addAnnotation(ToString.class)
-                .addField(FieldSpec.builder(Integer.class, "pageNum", Modifier.PRIVATE).build())
-                .addField(FieldSpec.builder(Integer.class, "pageSize", Modifier.PRIVATE).build())
+                .addField(FieldSpec.builder(Integer.class, "offset", Modifier.PRIVATE).build())
+                .addField(FieldSpec.builder(Integer.class, "limit", Modifier.PRIVATE).build())
                 .addJavadoc(JAVA_DOC + LocalDateTime.now())
                 .build();
 
@@ -438,7 +439,6 @@ public class JavapoetGenerator implements CodeGenerator{
         builder.addMethod(newExample);
 
         Set<TableColumn> columns = table.getColumns();
-
 
 
         for (TableColumn column : columns) {
@@ -811,12 +811,6 @@ public class JavapoetGenerator implements CodeGenerator{
                                 AnnotationSpec.builder(Param.class).addMember("value", "\"" + "page" + "\"").build())
                         .build();
 
-        ParameterSpec limitParamSpec =
-                ParameterSpec.builder(Integer.class, "limit")
-                        .addAnnotation(
-                                AnnotationSpec.builder(Param.class).addMember("value", "\"" + "limit" + "\"").build())
-                        .build();
-
         ParameterSpec pKeyParamSpec =
                 ParameterSpec.builder(convertJDBCTypetoClass(primaryKeyColumn.getDataType()),
                                 mapUnderScoreToLowerCamelCase(primaryKeyColumnName))
@@ -825,29 +819,9 @@ public class JavapoetGenerator implements CodeGenerator{
                                 .build())
                         .build();
 
-        ParameterSpec batchEntityParamSpec =
-                ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(List.class), entityClassName), "list")
-                        .addAnnotation(
-                                AnnotationSpec.builder(Param.class).addMember("value", "\"" + "list" + "\"").build())
-                        .build();
-
-        ParameterSpec pKey2EntityMapParamSpec =
-                ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(Map.class),
-                                ClassName.get(convertJDBCTypetoClass(primaryKeyColumn.getDataType())),
-                                entityClassName), "map")
-                        .addAnnotation(
-                                AnnotationSpec.builder(Param.class).addMember("value", "\"" + "map" + "\"").build())
-                        .build();
-
         MethodSpec insert = MethodSpec.methodBuilder("insert" + entityClassSpec.name)
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addParameter(entityParamSpec)
-                .returns(Integer.class)
-                .build();
-
-        MethodSpec batchInsert = MethodSpec.methodBuilder("batchInsert" + entityClassSpec.name + "s")
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addParameter(batchEntityParamSpec)
                 .returns(Integer.class)
                 .build();
 
@@ -858,14 +832,6 @@ public class JavapoetGenerator implements CodeGenerator{
                 .returns(Integer.class)
                 .addParameter(entityParamSpec)
                 .build();
-
-        MethodSpec batchUpdateByPKey = MethodSpec.methodBuilder(
-                        "batchUpdate" + entityClassSpec.name + "By" + mapUnderScoreToUpperCamelCase(primaryKeyColumnName) + "s")
-                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
-                .addParameter(pKey2EntityMapParamSpec)
-                .returns(Integer.class)
-                .build();
-
 
         MethodSpec count = MethodSpec.methodBuilder("count" + entityClassSpec.name + "s")
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
@@ -879,7 +845,6 @@ public class JavapoetGenerator implements CodeGenerator{
                 .addParameter(exampleParamSpec)
                 .addParameter(pageParamSpec)
                 .addParameter(sortParamSpec)
-                .addParameter(limitParamSpec)
                 .build();
 
 
@@ -891,9 +856,7 @@ public class JavapoetGenerator implements CodeGenerator{
 
         List<MethodSpec> methodSpecs = Lists.newArrayList(
                 insert,
-                batchInsert,
                 updateByPKey,
-                batchUpdateByPKey,
                 count,
                 batchSelect,
                 delete

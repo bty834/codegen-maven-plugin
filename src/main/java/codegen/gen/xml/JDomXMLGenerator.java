@@ -3,23 +3,18 @@ package codegen.gen.xml;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
-
-
 import codegen.ConfigProperties;
 import codegen.gen.CommonUtil;
 import codegen.table.Table;
@@ -86,9 +81,133 @@ public class JDomXMLGenerator implements XMLGenerator{
         Element batchInsert = batchInsert(table);
         mapper.addContent(batchInsert);
 
-        // TODO
+        Element update =  update(table);
+        mapper.addContent(update);
+
+        Element count = count(table);
+        mapper.addContent(count);
+
+        Element select = select(table);
+        mapper.addContent(select);
+
+        Element resultMap = resultMap(table);
+        mapper.addContent(resultMap);
+
+        Element delete = delete(table);
+        mapper.addContent(delete);
 
         return Collections.singletonMap(xmlName,xml);
+    }
+
+    private Element delete(Table table) {
+
+        Element delete = new Element("delete");
+        delete.setAttribute("id","delete"+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName()));
+        delete.setAttribute("parameterType", configProperties.getMapperInterfaceGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"QueryExample");
+
+        delete.addContent(" delete from "+table.getName());
+        delete.addContent(XmlElementUtil.example());
+        return delete;
+    }
+
+
+    private Element select(Table table) {
+        Element select = new Element("select");
+
+        select.setAttribute("id","select"+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"s");
+        select.setAttribute("resultMap","BaseResultMap");
+
+        List<String> columnNames = table.getColumns().stream().map(TableColumn::getColumnName).collect(Collectors.toList());
+
+        select.addContent("select "+ String.join(",",columnNames)+" from "+table.getName());
+        select.addContent(XmlElementUtil.example());
+
+        Element orderIf = new Element("if");
+        orderIf.setAttribute("test","sort!=null and sort.fieldName != null");
+
+        Element orderIfAsc = new Element("if");
+        orderIfAsc.setAttribute("test"," page.isAsc=null or page.isAsc=true ");
+        orderIfAsc.addContent(" order by sort.fieldName asc ");
+        orderIf.addContent(orderIfAsc);
+
+        Element orderIfDesc = new Element("if");
+        orderIfDesc.setAttribute("test"," page.isAsc!=null or page.isAsc=false ");
+        orderIfDesc.addContent(" order by sort.fieldName desc ");
+        orderIf.addContent(orderIfDesc);
+
+        select.addContent(orderIf);
+
+
+        Element ifEle = new Element("if");
+        ifEle.setAttribute("test", "page!=null and  page.limit !=null");
+
+        Element offsetIfNull = new Element("if");
+        offsetIfNull.setAttribute("test"," page.offset=null");
+        offsetIfNull.addContent("limit ${page.limit}");
+        ifEle.addContent(offsetIfNull);
+
+        Element offsetIfNotNull = new Element("if");
+        offsetIfNotNull.setAttribute("test"," page.offset!=null");
+        offsetIfNotNull.addContent("limit ${page.offset},${page.limit}");
+        ifEle.addContent(offsetIfNotNull);
+
+        select.addContent(ifEle);
+
+
+        return select;
+    }
+
+    private Element resultMap(Table table){
+        Element resultMap = new Element("resultMap");
+        resultMap.setAttribute("id","BaseResultMap");
+        resultMap.setAttribute("type", configProperties.getEntityGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName()));
+
+        TableColumn pkColumn = table.getPrimaryKeyColumn();
+        if(Objects.nonNull(pkColumn)){
+            Element id = new Element("id");
+            id.setAttribute("column", pkColumn.getColumnName());
+            id.setAttribute("property",CommonUtil.mapUnderScoreToLowerCamelCase(pkColumn.getColumnName()));
+            resultMap.addContent(id);
+        }
+
+        table.getColumns().forEach(c->{
+            if(Objects.nonNull(pkColumn) && c.equals(pkColumn)){
+                return;
+            }
+            Element result = new Element("result");
+            result.setAttribute("column",c.getColumnName());
+            result.setAttribute("property",CommonUtil.mapUnderScoreToLowerCamelCase(c.getColumnName()));
+            resultMap.addContent(result);
+        });
+        return resultMap;
+    }
+
+
+    private Element count(Table table) {
+        Element select = new Element("select");
+
+        select.setAttribute("id","count"+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"s");
+        select.setAttribute("parameterType", configProperties.getMapperInterfaceGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"QueryExample");
+        select.setAttribute("resultType","integer");
+
+        select.addContent("count(1) from "+ table.getName());
+        select.addContent(XmlElementUtil.example());
+
+        return select;
+    }
+
+
+    private Element update(Table table) {
+        Element update = new Element("update");
+        update.setAttribute("id","update"+
+                CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"By"+
+                CommonUtil.mapUnderScoreToUpperCamelCase(table.getPrimaryKeyColumn().getColumnName()));
+        update.addContent(" update "+table.getName());
+        List<String> columnNames = table.getColumns().stream().map(TableColumn::getColumnName).collect(Collectors.toList());
+        update.addContent(XmlElementUtil.updateSetOfIfList(CommonUtil.mapUnderScoreToLowerCamelCase(table.getName()),columnNames));
+        String pkColumnName = table.getPrimaryKeyColumn().getColumnName();
+        update.addContent(" where " + pkColumnName + " = #{" + CommonUtil.mapUnderScoreToLowerCamelCase(table.getName())+"."+CommonUtil.mapUnderScoreToLowerCamelCase(pkColumnName)+"}");
+        return update;
     }
 
     private Element insert(Table table){
