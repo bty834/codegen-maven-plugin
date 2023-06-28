@@ -98,8 +98,7 @@ public class JavapoetGenerator implements CodeGenerator {
 
 
     private void createDirsIfNecessary() throws MojoExecutionException {
-        prepareDir(
-                getAbsolutePathForPkg(this.configProperties.getBaseDir(), configProperties.getMapperInterfaceGenPkg()));
+        prepareDir(getAbsolutePathForPkg(this.configProperties.getBaseDir(), configProperties.getMapperInterfaceGenPkg()));
         prepareDir(getAbsolutePathForPkg(this.configProperties.getBaseDir(), this.configProperties.getEntityGenPkg()));
         prepareDir(this.configProperties.getMapperXmlGenAbsPath());
     }
@@ -120,7 +119,9 @@ public class JavapoetGenerator implements CodeGenerator {
 
         Builder builder = TypeSpec
                 .classBuilder(conditionUtilClassName)
-                .addModifiers(Modifier.PUBLIC);
+                .addModifiers(Modifier.PUBLIC)
+                .addJavadoc(JAVA_DOC+LocalDateTime.now())
+                .addJavadoc("<br/>This maven plugin is finished at 2023-06-28, hope my life's getting better~");
 
         ParameterSpec columnSpec = ParameterSpec.builder(String.class, "column").build();
 
