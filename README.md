@@ -21,26 +21,12 @@ XML文件生成使用 jdom2
         <plugin>
             <groupId>site.btyhub</groupId>
             <artifactId>codegen-maven-plugin</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <executions>
-                <execution>
-                    <goals>
-                        <goal>
-                            codegen
-                        </goal>
-                    </goals>
-                </execution>
-            </executions>
+            <version>1.0</version>
             <dependencies>
                 <dependency>
                     <groupId>com.mysql</groupId>
                     <artifactId>mysql-connector-j</artifactId>
                     <version>${mysql.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.mybatis</groupId>
-                    <artifactId>mybatis</artifactId>
-                    <version>${mybatis.version}</version>
                 </dependency>
                 <dependency>
                     <groupId>org.projectlombok</groupId>
