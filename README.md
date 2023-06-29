@@ -59,7 +59,8 @@ XML文件生成使用 jdom2
 
 2. 配置文件：参见resource目录下sample.yaml。目前仅支持yaml/yml
 
-3. QueryExample目前日期类型转化为String.class，且支持and的where条件，条件通过${}字符串拼接，非#{}。另外，表结构只支持一个主键列。
+3.  `mvn codegen:codegen`
+4. QueryExample目前日期类型转化为String.class，且支持and的where条件，条件通过${}字符串拼接，非#{}。另外，表结构只支持一个主键列。
 ```java
 PeopleQueryExample example = PeopleQueryExample.newExample()
                 .updateTimeGt("2023-06-20")

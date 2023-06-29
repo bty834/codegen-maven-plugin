@@ -91,8 +91,8 @@ public class JavapoetGenerator implements CodeGenerator {
         Map<String, TypeSpec> entityClassSpecs = generateEntity(tables);
         generatePageAndSort();
         generateConditionUtil();
-        Map<String, TypeSpec> queryExampleSpecs = generateQueryExample(tables, entityClassSpecs);
-        Map<String, TypeSpec> interfaceSpecs = generateMapperInterface(tables, entityClassSpecs, queryExampleSpecs);
+        Map<String, TypeSpec> queryExampleSpecs = generateQueryExample(tables);
+        generateMapperInterface(tables, entityClassSpecs, queryExampleSpecs);
 
     }
 
@@ -397,22 +397,21 @@ public class JavapoetGenerator implements CodeGenerator {
         persistTypeSpec(this.configProperties.getMapperInterfaceGenPkg(), Lists.newArrayList(page, sort));
     }
 
-    private Map<String, TypeSpec> generateQueryExample(Set<Table> tables, Map<String, TypeSpec> entityClassSpecs) {
-        Map<String, TypeSpec> queryExampleSpecs = buildQueryExamples(tables, entityClassSpecs);
+    private Map<String, TypeSpec> generateQueryExample(Set<Table> tables) {
+        Map<String, TypeSpec> queryExampleSpecs = buildQueryExamples(tables);
         persistTypeSpec(this.configProperties.getMapperInterfaceGenPkg(), queryExampleSpecs.values());
         return queryExampleSpecs;
     }
 
-    private Map<String, TypeSpec> buildQueryExamples(Set<Table> tables, Map<String, TypeSpec> entityClassSpecs) {
+    private Map<String, TypeSpec> buildQueryExamples(Set<Table> tables) {
         Map<String, TypeSpec> examples = Maps.newHashMap();
         tables.forEach(t -> {
-            String simpleClassName = mapUnderScoreToUpperCamelCase(t.getName());
-            examples.putAll(buildQueryExampleForTable(t, entityClassSpecs.get(simpleClassName)));
+            examples.putAll(buildQueryExampleForTable(t));
         });
         return examples;
     }
 
-    private Map<String, TypeSpec> buildQueryExampleForTable(Table table, TypeSpec entitySpec) {
+    private Map<String, TypeSpec> buildQueryExampleForTable(Table table) {
         String exampleSimpleName = mapUnderScoreToUpperCamelCase(table.getName()) + "QueryExample";
 
         ClassName exampleClassName = ClassName.get(this.configProperties.getMapperInterfaceGenPkg(), exampleSimpleName);
@@ -749,12 +748,12 @@ public class JavapoetGenerator implements CodeGenerator {
         return Collections.singletonMap(exampleSimpleName, builder.build());
     }
 
+    @SuppressWarnings("all")
     public Map<String, TypeSpec> generateMapperInterface(Set<Table> tables, Map<String, TypeSpec> entityClassSpecs,
             Map<String, TypeSpec> queryExampleSpecs) {
         Map<String, TypeSpec> interfaceSpecs = buildMapperInterfaces(tables, entityClassSpecs, queryExampleSpecs);
         persistTypeSpec(this.configProperties.getMapperInterfaceGenPkg(), interfaceSpecs.values());
         return interfaceSpecs;
-
     }
 
     private Map<String, TypeSpec> buildMapperInterfaces(Set<Table> tables, Map<String, TypeSpec> entityClassSpecs,
