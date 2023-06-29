@@ -1,10 +1,9 @@
-自定义Maven插件生成MyBatis实体类、Mapper、XML
+Auto-generate db entity, mapper interface, mapper XML of MyBatis
 
-Java类生成使用 javapoet
+- Java source code: javapoet
+- mapper XML: jdom2 
 
-XML文件生成使用 jdom2
-
-# 示例
+# Example
 ## entity
 ![](doc/image/entity.png)
 ## mapper
@@ -13,8 +12,8 @@ XML文件生成使用 jdom2
 ![](doc/image/xml.png)
 
 
-# 使用
-1. 引入build
+# Quick Start
+1. configure build in pom.xml
 ```xml
 <build>
     <plugins>
@@ -35,7 +34,7 @@ XML文件生成使用 jdom2
                 </dependency>
             </dependencies>
             <configuration>
-                <absoluteFilePath>${yaml配置文件绝对路径}</absoluteFilePath>
+                <absoluteFilePath>${absolute path of your yaml/yml config file}</absoluteFilePath>
                 <skip>false</skip>
             </configuration>
         </plugin>
@@ -43,10 +42,10 @@ XML文件生成使用 jdom2
 </build>
 ```
 
-2. 配置文件：参见resource目录下sample.yaml。目前仅支持yaml/yml
+2. config file：see sample.yaml in resources dir. only supports yaml/yml for now.
 
-3.  `mvn codegen:codegen`
-4. QueryExample目前日期类型转化为String.class，且支持and的where条件，条件通过${}字符串拼接，非#{}。另外，表结构只支持一个主键列。
+3.  run `mvn codegen:codegen`
+4. QueryExample convert all time types in db to String.class in Java. All where clauses supports 'and' only，concat by ${} for convenient implementation.And，only supports single column of primary key, which could cover most of our cases
 ```java
 PeopleQueryExample example = PeopleQueryExample.newExample()
                 .updateTimeGt("2023-06-20")
