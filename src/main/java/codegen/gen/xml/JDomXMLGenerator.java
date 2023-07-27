@@ -83,8 +83,8 @@ public class JDomXMLGenerator implements XMLGenerator{
         Element insert = insert(table);
         mapper.addContent(insert);
 
-        Element batchInsert = batchInsert(table);
-        mapper.addContent(batchInsert);
+//        Element batchInsert = batchInsert(table);
+//        mapper.addContent(batchInsert);
 
         Element update =  update(table);
         mapper.addContent(update);

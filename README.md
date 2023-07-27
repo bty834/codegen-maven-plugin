@@ -27,11 +27,6 @@ Auto-generate db entity, mapper interface, mapper XML of MyBatis
                     <artifactId>mysql-connector-j</artifactId>
                     <version>${mysql.version}</version>
                 </dependency>
-                <dependency>
-                    <groupId>org.projectlombok</groupId>
-                    <artifactId>lombok</artifactId>
-                    <version>${lombok.version}</version>
-                </dependency>
             </dependencies>
             <configuration>
                 <absoluteFilePath>${absolute path of your yaml/yml config file}</absoluteFilePath>
