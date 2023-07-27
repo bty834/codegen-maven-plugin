@@ -12,7 +12,7 @@ password: 12345678
 entityGenPkg: sample.entity
 # Mapper包名
 mapperInterfaceGenPkg: sample.mapper
-# xml绝对路径 TODO
+# xml绝对路径
 mapperXmlGenAbsPath: /Users/mac/IdeaProjects/codegen-maven-plugin/src/main/resources
 
 # 不生成
