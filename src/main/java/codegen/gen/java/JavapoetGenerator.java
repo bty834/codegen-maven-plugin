@@ -92,9 +92,9 @@ public class JavapoetGenerator implements CodeGenerator {
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(ParameterSpec.builder(String.class, "condition").build())
-                        .addStatement(" this.condition = condition;\n"
-                                + "            this.typeHandler = null;\n"
-                                + "            this.noValue = true;")
+                        .addStatement("    this.condition = condition;\n"
+                                + "this.typeHandler = null;\n"
+                                + "this.noValue = true")
                         .build()
                 )
                 .addMethod(MethodSpec.constructorBuilder()
@@ -102,14 +102,14 @@ public class JavapoetGenerator implements CodeGenerator {
                         .addParameter(ParameterSpec.builder(String.class, "condition").build())
                         .addParameter(ParameterSpec.builder(Object.class, "value").build())
                         .addParameter(ParameterSpec.builder(String.class, "typeHandler").build())
-                        .addStatement("this.condition = condition;\n"
-                                + "            this.value = value;\n"
-                                + "            this.typeHandler = typeHandler;\n"
-                                + "            if (value instanceof $T) {\n"
-                                + "                this.listValue = true;\n"
-                                + "            } else {\n"
-                                + "                this.singleValue = true;\n"
-                                + "            }",List.class)
+                        .addStatement("    this.condition = condition;\n"
+                                + "this.value = value;\n"
+                                + "this.typeHandler = typeHandler;\n"
+                                + "if (value instanceof $T) {\n"
+                                + "    this.listValue = true;\n"
+                                + "} else {\n"
+                                + "    this.singleValue = true;\n"
+                                + "}",List.class)
                         .build()
                 )
                 .addMethod(MethodSpec.constructorBuilder()
@@ -118,18 +118,18 @@ public class JavapoetGenerator implements CodeGenerator {
                         .addParameter(ParameterSpec.builder(Object.class, "value").build())
                         .addParameter(ParameterSpec.builder(Object.class, "secondValue").build())
                         .addParameter(ParameterSpec.builder(String.class, "typeHandler").build())
-                        .addStatement("this.condition = condition;\n"
-                                + "            this.value = value;\n"
-                                + "            this.secondValue = secondValue;\n"
-                                + "            this.typeHandler = typeHandler;\n"
-                                + "            this.betweenValue = true;")
+                        .addStatement("    this.condition = condition;\n"
+                                + "this.value = value;\n"
+                                + "this.secondValue = secondValue;\n"
+                                + "this.typeHandler = typeHandler;\n"
+                                + "this.betweenValue = true")
                         .build()
                 )
                 .addMethod(MethodSpec.constructorBuilder()
                         .addModifiers(Modifier.PUBLIC)
                         .addParameter(ParameterSpec.builder(String.class, "condition").build())
                         .addParameter(ParameterSpec.builder(Object.class, "value").build())
-                        .addStatement("this(condition, value, null);")
+                        .addStatement("this(condition, value, null)")
                         .build()
                 )
                 .addMethod(MethodSpec.constructorBuilder()
@@ -137,7 +137,7 @@ public class JavapoetGenerator implements CodeGenerator {
                         .addParameter(ParameterSpec.builder(String.class, "condition").build())
                         .addParameter(ParameterSpec.builder(Object.class, "value").build())
                         .addParameter(ParameterSpec.builder(Object.class, "secondValue").build())
-                        .addStatement("this(condition, value, secondValue, null);")
+                        .addStatement("this(condition, value, secondValue, null)")
                         .build()
                 ).build();
 
@@ -182,10 +182,7 @@ public class JavapoetGenerator implements CodeGenerator {
     }
 
     private Map<String, TypeSpec> buildQueryExampleForTable(Table table) throws ClassNotFoundException {
-        // TODO
         String simpleClassName = mapUnderScoreToUpperCamelCase(table.getName())+"Example";
-
-
 
         ClassName criteria = ClassName.get(configProperties.getMapperInterfaceGenPkg()+"."+simpleClassName,"Criteria");
         ClassName criterion = ClassName.get(configProperties.getMapperInterfaceGenPkg(),"Criterion");
@@ -200,74 +197,74 @@ public class JavapoetGenerator implements CodeGenerator {
             MethodSpec _1 = MethodSpec.methodBuilder("and" + upperCamelName + "IsNull")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
-                    .addStatement("addCriterion(\" "+lowerCamelName+" is null \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" is null \");\n"
+                            + "return this")
                     .build();
             MethodSpec _2 = MethodSpec.methodBuilder("and" + upperCamelName + "IsNotNull")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
-                    .addStatement("addCriterion( \" "+lowerCamelName+" is not null \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion( \" "+lowerCamelName+" is not null \");\n"
+                            + "return this")
                     .build();
             MethodSpec _3 = MethodSpec.methodBuilder("and" + upperCamelName + "Equals")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value").build())
-                    .addStatement("addCriterion( \" "+lowerCamelName+" = \",value,\" "+lowerCamelName+" \" );\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion( \" "+lowerCamelName+" = \",value,\" "+lowerCamelName+" \" );\n"
+                            + "return this")
                     .build();
             MethodSpec _4 = MethodSpec.methodBuilder("and" + upperCamelName + "NotEquals")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value").build())
-                    .addStatement("addCriterion(\" "+lowerCamelName+" <> \" ,value, \" "+lowerCamelName+" \" );\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" <> \" ,value, \" "+lowerCamelName+" \" );\n"
+                            + "return this")
                     .build();
 
             MethodSpec _5 = MethodSpec.methodBuilder("and" + upperCamelName + "Gt")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value").build())
-                    .addStatement("addCriterion(\" "+lowerCamelName+" > \" ,value, \" "+lowerCamelName+" \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" > \" ,value, \" "+lowerCamelName+" \");\n"
+                            + "return this")
                     .build();
             MethodSpec _6 = MethodSpec.methodBuilder("and" + upperCamelName + "Gte")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value").build())
-                    .addStatement("addCriterion(\" "+lowerCamelName+" >= \" ,value, \" "+lowerCamelName+" \" );\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" >= \" ,value, \" "+lowerCamelName+" \" );\n"
+                            + "return this")
                     .build();
 
             MethodSpec _7 = MethodSpec.methodBuilder("and" + upperCamelName + "Lt")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value").build())
-                    .addStatement("addCriterion(\" "+lowerCamelName+" < \" ,value, \" "+lowerCamelName+" \" );\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" < \" ,value, \" "+lowerCamelName+" \" );\n"
+                            + "return this")
                     .build();
             MethodSpec _8 = MethodSpec.methodBuilder("and" + upperCamelName + "Lte")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value").build())
-                    .addStatement("addCriterion(\" "+lowerCamelName+" <= \" ,value, \" "+lowerCamelName+" \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" <= \" ,value, \" "+lowerCamelName+" \");\n"
+                            + "return this")
                     .build();
 
             MethodSpec _9 = MethodSpec.methodBuilder("and" + upperCamelName + "In")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(List.class), TypeName.get(type)),"values").build())
-                    .addStatement("addCriterion(\" "+lowerCamelName+" in \" ,values, \" "+lowerCamelName+" \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" in \" ,values, \" "+lowerCamelName+" \");\n"
+                            + "return this")
                     .build();
 
             MethodSpec _10 = MethodSpec.methodBuilder("and" + upperCamelName + "NotIn")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(ParameterizedTypeName.get(ClassName.get(List.class), TypeName.get(type)),"values").build())
-                    .addStatement("addCriterion(\" "+lowerCamelName+" not in \" ,values, \" "+lowerCamelName+" \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" not in \" ,values, \" "+lowerCamelName+" \");\n"
+                            + "return this")
                     .build();
 
             MethodSpec _11 = MethodSpec.methodBuilder("and" + upperCamelName + "Between")
@@ -275,18 +272,16 @@ public class JavapoetGenerator implements CodeGenerator {
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value1").build())
                     .addParameter(ParameterSpec.builder(type,"value2").build())
-
-                    .addStatement("addCriterion(\" "+lowerCamelName+" between \" ,value1,value2, \" "+lowerCamelName+" \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" between \" ,value1,value2, \" "+lowerCamelName+" \");\n"
+                            + "return this")
                     .build();
             MethodSpec _12 = MethodSpec.methodBuilder("and" + upperCamelName + "NotBetween")
                     .addModifiers(Modifier.PUBLIC)
                     .returns(criteria)
                     .addParameter(ParameterSpec.builder(type,"value1").build())
                     .addParameter(ParameterSpec.builder(type,"value2").build())
-
-                    .addStatement("addCriterion(\" "+lowerCamelName+" not between \" ,value1,value2, \" "+lowerCamelName+" \");\n"
-                            + "return ($T) this",criteria)
+                    .addStatement("    addCriterion(\" "+lowerCamelName+" not between \" ,value1,value2, \" "+lowerCamelName+" \");\n"
+                            + "return this")
                     .build();
             ms.addAll(Arrays.asList(_1,_2,_3,_4,_5,_6,_7,_8,_9,_10,_11,_12));
         }
@@ -351,6 +346,7 @@ public class JavapoetGenerator implements CodeGenerator {
         Builder builder = TypeSpec.classBuilder(simpleClassName)
                 .addModifiers(Modifier.PUBLIC)
                 .addAnnotation(Getter.class)
+                .addAnnotation(AnnotationSpec.builder(SuppressWarnings.class).addMember("value",CodeBlock.of("$S","all")).build())
                 .addField(FieldSpec.builder(String.class,"orderByClause",Modifier.PRIVATE).build())
                 .addField(FieldSpec.builder(TypeName.BOOLEAN,"distinct",Modifier.PRIVATE).build())
                 .addField(FieldSpec.builder(ParameterizedTypeName.get(ClassName.get(List.class),criteria),"oredCriteria",Modifier.PRIVATE).build())

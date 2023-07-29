@@ -119,8 +119,10 @@ public class XmlElementUtil {
         when3.setAttribute("test","criterion.betweenValue");
         when3.addContent("and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}");
         Element when4 = new Element("when");
-        when4.setAttribute("test","criterion.listValue");
+        when4.setAttribute("test","criterion.listValue!=null and criterion.listValue.size>0");
         when4.addContent("and ${criterion.condition}");
+        Element otherwise = new Element("otherwise");
+        otherwise.addContent("false");
 
         Element whenForeach = new Element("foreach");
         whenForeach.setAttribute("open","(");
@@ -136,6 +138,7 @@ public class XmlElementUtil {
         contents.add(when2);
         contents.add(when3);
         contents.add(when4);
+        contents.add(otherwise);
         choose.addContent(contents);
 
         return whereClause;
