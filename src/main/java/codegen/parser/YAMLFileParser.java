@@ -12,7 +12,6 @@ import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import codegen.ConfigProperties;
 
 /**
- * TODO 类描述
  *
  * @author: baotingyu
  * @date: 2023/6/25

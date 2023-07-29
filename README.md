@@ -40,10 +40,13 @@ Auto-generate db entity, mapper interface, mapper XML of MyBatis
 2. config file：see sample.yaml in resources dir. only supports yaml/yml for now.
 
 3.  run `mvn codegen:codegen`
-4. QueryExample convert all time types in db to String.class in Java. All where clauses supports 'and' only，concat by ${} for convenient implementation.And，only supports single column of primary key, which could cover most of our cases
+4. Example use case
 ```java
-PeopleQueryExample example = PeopleQueryExample.newExample()
-                .updateTimeGt("2023-06-20")
-                .nameIn(Arrays.asList("name_1", "name_2"))
-                .numberLte(10000);
+       PeopleExample peopleExample = new PeopleExample();
+        Criteria criteria = peopleExample.createCriteria();
+        criteria.andCreateTimeGt("2023").andIdBetween(1,10).andNameIsNull();
+        Criteria or = peopleExample.or();
+        or.andIdBetween(100,1000);
+        peopleExample.setDistinct(true).setLimit(1).setOffset(199);
+
 ```

@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.jdom2.Comment;
+import org.jdom2.Content;
 import org.jdom2.DocType;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -24,7 +26,6 @@ import codegen.table.TableColumn;
 import edu.emory.mathcs.backport.java.util.Collections;
 
 /**
- * TODO 类描述
  *
  * @author: baotingyu
  * @date: 2023/6/27
@@ -80,6 +81,13 @@ public class JDomXMLGenerator implements XMLGenerator{
         mapper.setAttribute("namespace", configProperties.getMapperInterfaceGenPkg()+"."+xmlName);
         xml.addContent(mapper);
 
+
+        Element sqlWhereClause = XmlElementUtil.exampleWhereClause();
+        mapper.addContent(sqlWhereClause);
+
+        Element resultMap = resultMap(table);
+        mapper.addContent(resultMap);
+
         Element insert = insert(table);
         mapper.addContent(insert);
 
@@ -95,8 +103,6 @@ public class JDomXMLGenerator implements XMLGenerator{
         Element select = select(table);
         mapper.addContent(select);
 
-        Element resultMap = resultMap(table);
-        mapper.addContent(resultMap);
 
         Element delete = delete(table);
         mapper.addContent(delete);
@@ -104,14 +110,15 @@ public class JDomXMLGenerator implements XMLGenerator{
         return Collections.singletonMap(xmlName,xml);
     }
 
+
     private Element delete(Table table) {
 
         Element delete = new Element("delete");
         delete.setAttribute("id","delete"+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName()));
-        delete.setAttribute("parameterType", configProperties.getMapperInterfaceGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"QueryExample");
+        delete.setAttribute("parameterType", configProperties.getMapperInterfaceGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"Example");
 
         delete.addContent(" delete from "+table.getName());
-        delete.addContent(XmlElementUtil.example());
+        delete.addContent(XmlElementUtil.exampleWhereClauseSqlRef());
         return delete;
     }
 
@@ -124,40 +131,36 @@ public class JDomXMLGenerator implements XMLGenerator{
 
         List<String> columnNames = table.getColumns().stream().map(TableColumn::getColumnName).collect(Collectors.toList());
 
-        select.addContent("select "+ String.join(",",columnNames)+" from "+table.getName());
-        select.addContent(XmlElementUtil.example());
+
+        Element distinctIf = new Element("if");
+        distinctIf.setAttribute("test","distinct");
+        distinctIf.addContent(" distinct ");
+
+        select.addContent("select ");
+        select.addContent(distinctIf);
+        select.addContent(String.join(",",columnNames)+" from "+table.getName());
 
         Element orderIf = new Element("if");
-        orderIf.setAttribute("test","sort!=null and sort.fieldName != null");
+        orderIf.setAttribute("test","orderByClause != null");
+        orderIf.addContent("order by ${orderByClause}");
 
-        Element orderIfAsc = new Element("if");
-        orderIfAsc.setAttribute("test"," page.isAsc=null or page.isAsc=true ");
-        orderIfAsc.addContent(" order by ${sort.fieldName} asc ");
-        orderIf.addContent(orderIfAsc);
+        Element limitIf = new Element("if");
+        limitIf.setAttribute("test","limit != null");
 
-        Element orderIfDesc = new Element("if");
-        orderIfDesc.setAttribute("test"," page.isAsc!=null or page.isAsc=false ");
-        orderIfDesc.addContent(" order by ${sort.fieldName} desc ");
-        orderIf.addContent(orderIfDesc);
+        Element nonNullOffsetIf = new Element("if");
+        nonNullOffsetIf.setAttribute("test","offset != null");
+        nonNullOffsetIf.addContent("limit ${offset}, ${limit}");
 
+        Element nullOffsetIf = new Element("if");
+        nullOffsetIf.setAttribute("test","offset == null");
+        nullOffsetIf.addContent("limit ${limit}");
+
+        limitIf.addContent(nonNullOffsetIf);
+        limitIf.addContent(nullOffsetIf);
+
+        select.addContent(XmlElementUtil.exampleWhereClauseSqlRef());
         select.addContent(orderIf);
-
-
-        Element ifEle = new Element("if");
-        ifEle.setAttribute("test", "page!=null and  page.limit !=null");
-
-        Element offsetIfNull = new Element("if");
-        offsetIfNull.setAttribute("test"," page.offset=null");
-        offsetIfNull.addContent("limit ${page.limit}");
-        ifEle.addContent(offsetIfNull);
-
-        Element offsetIfNotNull = new Element("if");
-        offsetIfNotNull.setAttribute("test"," page.offset!=null");
-        offsetIfNotNull.addContent("limit ${page.offset},${page.limit}");
-        ifEle.addContent(offsetIfNotNull);
-
-        select.addContent(ifEle);
-
+        select.addContent(limitIf);
 
         return select;
     }
@@ -192,11 +195,11 @@ public class JDomXMLGenerator implements XMLGenerator{
         Element select = new Element("select");
 
         select.setAttribute("id","count"+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"s");
-        select.setAttribute("parameterType", configProperties.getMapperInterfaceGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"QueryExample");
+        select.setAttribute("parameterType", configProperties.getMapperInterfaceGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"Example");
         select.setAttribute("resultType","integer");
 
         select.addContent("count(1) from "+ table.getName());
-        select.addContent(XmlElementUtil.example());
+        select.addContent(XmlElementUtil.exampleWhereClauseSqlRef());
 
         return select;
     }
@@ -227,37 +230,6 @@ public class JDomXMLGenerator implements XMLGenerator{
         return insert;
     }
 
-    private Element batchInsert(Table table){
-        Element batchInsert = new Element("insert");
-        batchInsert.setAttribute("id","batchInsert"+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName())+"s");
-        batchInsert.setAttribute("parameterType", configProperties.getEntityGenPkg()+"."+CommonUtil.mapUnderScoreToUpperCamelCase(table.getName()));
-        batchInsert.addContent(" insert into "+ table.getName());
-        List<String> columnNames = table.getColumns().stream().map(TableColumn::getColumnName).collect(Collectors.toList());
-
-
-        batchInsert.addContent(" (");
-        batchInsert.addContent(String.join(",",columnNames));
-        batchInsert.addContent(") ");
-
-        batchInsert.addContent(" values ");
-
-        Element foreach = new Element("foreach");
-        foreach.setAttribute("collection","list");
-        foreach.setAttribute("item","item");
-        foreach.setAttribute("separator",",");
-
-        batchInsert.addContent(foreach);
-
-        List<String> input = columnNames.stream()
-                .map(columnName -> "#{item." + CommonUtil.mapUnderScoreToLowerCamelCase(columnName) + "}").collect(
-                        Collectors.toList());
-        foreach.addContent(" (");
-        foreach.addContent(String.join(",",input));
-        foreach.addContent(") ");
-
-        return batchInsert;
-
-    }
 
 
 

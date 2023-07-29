@@ -8,7 +8,6 @@ import codegen.ConfigProperties;
 import codegen.table.Table;
 
 /**
- * TODO 类描述
  *
  * @author: baotingyu
  * @date: 2023/6/27
