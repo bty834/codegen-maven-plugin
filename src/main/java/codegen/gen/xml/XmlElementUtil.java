@@ -2,10 +2,8 @@ package codegen.gen.xml;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import org.jdom2.Content;
 import org.jdom2.Element;
-
 import codegen.gen.CommonUtil;
 
 /**

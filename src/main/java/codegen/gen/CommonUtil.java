@@ -2,10 +2,7 @@ package codegen.gen;
 
 import java.io.File;
 import java.sql.Types;
-import java.util.Objects;
-
 import org.apache.maven.plugin.MojoExecutionException;
-
 import com.google.common.base.CaseFormat;
 
 /**

@@ -8,12 +8,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
-
 import org.apache.maven.plugin.MojoExecutionException;
 import org.checkerframework.checker.nullness.qual.Nullable;
-
 import com.google.common.collect.Sets;
-
 import codegen.ConfigProperties;
 
 /**

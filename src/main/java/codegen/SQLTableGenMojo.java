@@ -14,7 +14,6 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-
 import codegen.gen.java.CodeGenerator;
 import codegen.gen.xml.XMLGenerator;
 import codegen.table.Table;
@@ -22,7 +21,6 @@ import codegen.parser.ConfigFileParser;
 import codegen.table.TableFetcher;
 
 /**
- * TODO 类描述
  *
  * @author: baotingyu
  * @date: 2023/6/24

@@ -7,7 +7,6 @@ import static codegen.gen.CommonUtil.getAbsolutePathForSrcMainJava;
 import static codegen.gen.CommonUtil.mapUnderScoreToLowerCamelCase;
 import static codegen.gen.CommonUtil.mapUnderScoreToUpperCamelCase;
 import static codegen.gen.CommonUtil.prepareDir;
-
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -21,12 +20,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import javax.lang.model.element.Modifier;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.maven.plugin.MojoExecutionException;
-
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.squareup.javapoet.AnnotationSpec;
@@ -40,7 +37,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.squareup.javapoet.TypeSpec.Builder;
-
 import codegen.ConfigProperties;
 import codegen.table.Table;
 import codegen.table.TableColumn;

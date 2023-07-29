@@ -1,7 +1,6 @@
 package codegen.parser;
 
 import java.io.IOException;
-
 import codegen.ConfigProperties;
 
 /**

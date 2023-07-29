@@ -1,11 +1,9 @@
 package codegen.table;
 
 import java.util.Set;
-
 import codegen.ConfigProperties;
 
 /**
- * TODO 类描述
  *
  * @author: baotingyu
  * @date: 2023/6/25
