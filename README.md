@@ -7,9 +7,11 @@ Auto-generate db entity, mapper interface, mapper XML of MyBatis
 ## entity
 ![](doc/image/entity.png)
 ## mapper
-![](doc/image/mapper.png)
+![](doc/image/mapper.jpg)
 ## xml
-![](doc/image/xml.png)
+![](doc/image/xml.jpg)
+![](doc/image/xml2.jpg)
+
 
 
 # Quick Start
